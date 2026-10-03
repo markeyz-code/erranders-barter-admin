@@ -8,6 +8,7 @@ import { START_LOCATION, createMemoryHistory, createRouter, useRoute as useRoute
 import { defu } from "/Users/marquis/erranders/barter/admin/node_modules/defu/dist/defu.mjs";
 import { hasProtocol, joinURL, parseURL, encodePath, decodePath, withQuery, isScriptProtocol } from "/Users/marquis/erranders/barter/admin/node_modules/ufo/dist/index.mjs";
 import { ssrRenderComponent, ssrRenderSuspense, ssrRenderVNode } from "vue/server-renderer";
+import { useSeoMeta as useSeoMeta$1, useHead as useHead$1, headSymbol } from "/Users/marquis/erranders/barter/admin/node_modules/@unhead/vue/dist/index.mjs";
 if (!globalThis.$fetch) {
   globalThis.$fetch = $fetch.create({
     baseURL: baseURL()
@@ -587,11 +588,14 @@ function getRouteRules(arg) {
     return {};
   }
 }
+const __nuxt_page_meta$2 = {
+  layout: false
+};
 const __nuxt_page_meta$1 = {
   layout: false
 };
 const __nuxt_page_meta = {
-  layout: false
+  layout: "dashboard"
 };
 const _routes = [
   {
@@ -602,19 +606,19 @@ const _routes = [
   {
     name: "login",
     path: "/login",
-    meta: __nuxt_page_meta$1 || {},
-    component: () => import("./_nuxt/login-DSdGQKWl.js")
+    meta: __nuxt_page_meta$2 || {},
+    component: () => import("./_nuxt/login-DsH7CjYL.js")
   },
   {
     name: "dashboard-chats",
     path: "/dashboard/chats",
-    meta: __nuxt_page_meta || {},
-    component: () => import("./_nuxt/chats-0BEDbU0o.js")
+    meta: __nuxt_page_meta$1 || {},
+    component: () => import("./_nuxt/chats-ZtiMGH00.js")
   },
   {
     name: "dashboard",
     path: "/dashboard",
-    component: () => import("./_nuxt/index-DoM0fpOr.js")
+    component: () => import("./_nuxt/index-CxpxoHk7.js")
   },
   {
     name: "dashboard-items",
@@ -632,9 +636,15 @@ const _routes = [
     component: () => import("./_nuxt/disputes-BS3aOyMP.js")
   },
   {
+    name: "dashboard-settings",
+    path: "/dashboard/settings",
+    meta: __nuxt_page_meta || {},
+    component: () => import("./_nuxt/settings-CoQ8WIvN.js")
+  },
+  {
     name: "dashboard-logistics",
     path: "/dashboard/logistics",
-    component: () => import("./_nuxt/logistics-DC0H80W_.js")
+    component: () => import("./_nuxt/logistics-LSrWlJJO.js")
   }
 ];
 const validate = /* @__PURE__ */ defineNuxtRouteMiddleware(async (to) => {
@@ -906,6 +916,26 @@ const plugin = /* @__PURE__ */ defineNuxtPlugin({
     return { provide: { router } };
   }
 });
+function injectHead(nuxtApp) {
+  const nuxt = nuxtApp || tryUseNuxtApp();
+  return nuxt?.ssrContext?.head || nuxt?.runWithContext(() => {
+    if (hasInjectionContext()) {
+      return inject(headSymbol);
+    }
+  });
+}
+function useHead(input, options = {}) {
+  const head = injectHead(options.nuxt);
+  if (head) {
+    return useHead$1(input, { head, ...options });
+  }
+}
+function useSeoMeta(input, options = {}) {
+  const head = injectHead(options.nuxt);
+  if (head) {
+    return useSeoMeta$1(input, { head, ...options });
+  }
+}
 function definePayloadReducer(name, reduce) {
   {
     useNuxtApp().ssrContext["~payloadReducers"][name] = reduce;
@@ -985,7 +1015,7 @@ const plugins = [
   prerender_server_sqIxOBipVr4FbVMA9kqWL0wT8FPop6sKAXLVfifsJzk
 ];
 const layouts = {
-  default: defineAsyncComponent(() => import("./_nuxt/default-Bf_iBGD7.js").then((m) => m.default || m))
+  default: defineAsyncComponent(() => import("./_nuxt/default-DjYfBe--.js").then((m) => m.default || m))
 };
 const routeRulesMatcher = _routeRulesMatcher;
 const LayoutLoader = defineComponent({
@@ -1238,37 +1268,39 @@ function normalizeSlot(slot, data) {
   const slotContent = slot(data);
   return slotContent.length === 1 ? h(slotContent[0]) : h(Fragment, void 0, slotContent);
 }
-const _export_sfc = (sfc, props) => {
-  const target = sfc.__vccOpts || sfc;
-  for (const [key, val] of props) {
-    target[key] = val;
+const _sfc_main$2 = {
+  __name: "app",
+  __ssrInlineRender: true,
+  setup(__props) {
+    useSeoMeta({
+      ogImage: "/logo.png",
+      twitterImage: "/logo.png",
+      twitterCard: "summary_large_image"
+    });
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_NuxtLayout = __nuxt_component_0;
+      const _component_NuxtPage = __nuxt_component_1;
+      _push(ssrRenderComponent(_component_NuxtLayout, _attrs, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(ssrRenderComponent(_component_NuxtPage, null, null, _parent2, _scopeId));
+          } else {
+            return [
+              createVNode(_component_NuxtPage)
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+    };
   }
-  return target;
 };
-const _sfc_main$2 = {};
-function _sfc_ssrRender(_ctx, _push, _parent, _attrs) {
-  const _component_NuxtLayout = __nuxt_component_0;
-  const _component_NuxtPage = __nuxt_component_1;
-  _push(ssrRenderComponent(_component_NuxtLayout, _attrs, {
-    default: withCtx((_, _push2, _parent2, _scopeId) => {
-      if (_push2) {
-        _push2(ssrRenderComponent(_component_NuxtPage, null, null, _parent2, _scopeId));
-      } else {
-        return [
-          createVNode(_component_NuxtPage)
-        ];
-      }
-    }),
-    _: 1
-  }, _parent));
-}
 const _sfc_setup$2 = _sfc_main$2.setup;
 _sfc_main$2.setup = (props, ctx) => {
   const ssrContext = useSSRContext();
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("app.vue");
   return _sfc_setup$2 ? _sfc_setup$2(props, ctx) : void 0;
 };
-const AppComponent = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["ssrRender", _sfc_ssrRender]]);
 const _sfc_main$1 = {
   __name: "nuxt-error-page",
   __ssrInlineRender: true,
@@ -1283,8 +1315,8 @@ const _sfc_main$1 = {
     const statusText = _error.statusMessage ?? (is404 ? "Page Not Found" : "Internal Server Error");
     const description = _error.message || _error.toString();
     const stack = void 0;
-    const _Error404 = defineAsyncComponent(() => import("./_nuxt/error-404-ThONG28D.js"));
-    const _Error = defineAsyncComponent(() => import("./_nuxt/error-500-B6uFWUAC.js"));
+    const _Error404 = defineAsyncComponent(() => import("./_nuxt/error-404-BqZlehS5.js"));
+    const _Error = defineAsyncComponent(() => import("./_nuxt/error-500-BLf-CsaF.js"));
     const ErrorTemplate = is404 ? _Error404 : _Error;
     return (_ctx, _push, _parent, _attrs) => {
       _push(ssrRenderComponent(unref(ErrorTemplate), mergeProps({ status: unref(status), statusText: unref(statusText), statusCode: unref(status), statusMessage: unref(statusText), description: unref(description), stack: unref(stack) }, _attrs), null, _parent));
@@ -1342,7 +1374,7 @@ const _sfc_main = {
           } else if (unref(SingleRenderer)) {
             ssrRenderVNode(_push, createVNode(resolveDynamicComponent(unref(SingleRenderer)), null, null), _parent);
           } else {
-            _push(ssrRenderComponent(unref(AppComponent), null, null, _parent));
+            _push(ssrRenderComponent(unref(_sfc_main$2), null, null, _parent));
           }
         },
         _: 1
@@ -1376,15 +1408,15 @@ let entry;
 }
 const entry_default = ((ssrContext) => entry(ssrContext));
 export {
-  _export_sfc as _,
   useNuxtApp as a,
-  useRuntimeConfig as b,
-  nuxtLinkDefaults as c,
+  useRequestEvent as b,
+  useRouter as c,
+  useRuntimeConfig as d,
   entry_default as default,
   encodeRoutePath as e,
+  nuxtLinkDefaults as f,
   navigateTo as n,
   resolveRouteObject as r,
-  tryUseNuxtApp as t,
-  useRouter as u
+  useHead as u
 };
 //# sourceMappingURL=server.mjs.map

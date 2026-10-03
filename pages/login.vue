@@ -8,12 +8,7 @@
       <div class="bg-white/80 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-white">
         
         <div class="text-center mb-6 flex flex-col items-center">
-          <div class="inline-flex items-center justify-center w-14 h-14 rounded-[1.25rem] bg-brand-600 text-white mb-4 shadow-sm border border-brand-500/50">
-            <ArrowRightLeft class="w-8 h-8 text-white" />
-          </div>
-          <h2 class="text-3xl font-black text-slate-900 tracking-tight">
-            Barter.
-          </h2>
+          <img src="/logo.png" alt="Erranders Barter Admin" class="h-16 w-auto mb-4" />
           <p class="mt-2 text-sm text-slate-500 font-medium">
             Welcome back! Select your role to continue
           </p>
@@ -45,7 +40,10 @@
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Lock class="h-5 w-5 text-slate-400" />
               </div>
-              <input id="password" name="password" type="password" autocomplete="current-password" required v-model="password" class="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 sm:text-sm bg-white text-slate-900 transition-all placeholder:text-slate-400" placeholder="••••••••">
+              <input id="password" name="password" :type="showPassword ? 'text' : 'password'" autocomplete="current-password" required v-model="password" class="block w-full pl-10 pr-10 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 sm:text-sm bg-white text-slate-900 transition-all placeholder:text-slate-400" placeholder="••••••••">
+              <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-slate-400 hover:text-slate-600 transition-colors focus:outline-none" @click="showPassword = !showPassword">
+                <component :is="showPassword ? EyeOff : Eye" class="h-5 w-5" />
+              </button>
             </div>
           </div>
 
@@ -88,7 +86,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { Mail, Lock, ArrowRight, Loader2, AlertCircle, ArrowRightLeft } from 'lucide-vue-next';
+import { Mail, Lock, ArrowRight, Loader2, AlertCircle, ArrowRightLeft, Eye, EyeOff } from 'lucide-vue-next';
 import { useAuth } from '@/composables/modules/auth/useAuth';
 
 definePageMeta({
@@ -97,6 +95,7 @@ definePageMeta({
 
 const email = ref('');
 const password = ref('');
+const showPassword = ref(false);
 const loginRole = ref('admin');
 const router = useRouter();
 
@@ -122,9 +121,9 @@ const handleLogin = async () => {
     
     // Different routing based on role
     if (loginRole.value === 'support') {
-      router.push('/dashboard/chats'); // Support goes directly to chats/complaints
+      window.location.href = '/dashboard/chats'; // Support goes directly to chats/complaints
     } else {
-      router.push('/dashboard'); // Admin goes to overview
+      window.location.href = '/dashboard'; // Admin goes to overview
     }
   } catch (err) {
     console.error(err);

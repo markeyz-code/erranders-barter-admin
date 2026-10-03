@@ -2,11 +2,8 @@
   <div class="min-h-screen bg-slate-50 flex">
     <!-- Sidebar -->
     <aside class="w-64 bg-white border-r border-slate-200 text-slate-800 flex flex-col shrink-0 hidden md:flex transition-all duration-300">
-      <div class="p-6 border-b border-slate-100 flex items-center gap-2">
-        <div class="w-8 h-8 bg-brand-600 rounded-full flex items-center justify-center border border-slate-200">
-          <ArrowRightLeft class="w-4 h-4 text-white" />
-        </div>
-        <span class="font-black text-xl tracking-tighter text-slate-900">Barter.</span>
+      <div class="p-6 border-b border-slate-100 flex items-center justify-center">
+        <img src="/logo.png" alt="Erranders Barter Admin" class="h-10 w-auto" />
       </div>
       
       <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -39,6 +36,11 @@
         <NuxtLink to="/dashboard/logistics" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group" active-class="bg-brand-50 text-brand-700" inactive-class="text-slate-600 hover:bg-slate-50 hover:text-slate-900">
           <Truck class="w-5 h-5 mr-3 shrink-0" :class="{'text-brand-600': $route.path.startsWith('/dashboard/logistics'), 'text-slate-400 group-hover:text-slate-600': !$route.path.startsWith('/dashboard/logistics')}" />
           Logistics
+        </NuxtLink>
+
+        <NuxtLink to="/dashboard/settings" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group" active-class="bg-brand-50 text-brand-700" inactive-class="text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+          <Settings class="w-5 h-5 mr-3 shrink-0" :class="{'text-brand-600': $route.path.startsWith('/dashboard/settings'), 'text-slate-400 group-hover:text-slate-600': !$route.path.startsWith('/dashboard/settings')}" />
+          Platform Settings
         </NuxtLink>
       </nav>
 
@@ -179,6 +181,12 @@ const handleLogout = () => {
 
 const confirmLogout = () => {
   showLogoutModal.value = false;
+  const token = useCookie('barter_token', { path: '/' });
+  token.value = null;
+  if (typeof window !== 'undefined') {
+    document.cookie = 'barter_token=; Max-Age=0; path=/';
+    localStorage.removeItem('barter_token');
+  }
   router.push('/login');
 };
 </script>

@@ -9,6 +9,10 @@ export const useAuth = () => {
     loading.value = true;
     try {
       const res = await authApi.login(data);
+      const token = useCookie('barter_token', { maxAge: 60 * 60 * 24 * 7, path: '/' });
+      token.value = res.data.access_token;
+      
+      // Fallback for legacy local storage
       if (typeof window !== 'undefined') {
         localStorage.setItem('barter_token', res.data.access_token);
       }

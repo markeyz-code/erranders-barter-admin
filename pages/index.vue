@@ -9,6 +9,6 @@ import { onMounted } from 'vue';
 const router = useRouter();
 
 onMounted(() => {
-  router.push('/dashboard');
+  router.push('/login');
 });
 </script>

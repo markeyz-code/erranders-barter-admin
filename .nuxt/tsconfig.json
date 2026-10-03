@@ -17,7 +17,7 @@
         "../node_modules/@vue/compiler-sfc"
       ],
       "@nuxt/schema": [
-        "../node_modules/@nuxt/schema"
+        "../node_modules/nuxt/node_modules/@nuxt/schema"
       ],
       "defu": [
         "../node_modules/defu"
@@ -118,11 +118,8 @@
       "#tailwind-config": [
         "./tailwind/expose"
       ],
-      "#tailwind-config/*": [
-        "./tailwind/expose/*"
-      ],
       "#app-manifest": [
-        "./manifest/meta/0560c518-6b7b-4547-8d6a-c97dab90adbc.json"
+        "./manifest/meta/08d88529-3de0-42e9-a10d-6b882e0b463a.json"
       ],
       "#components": [
         "./components"
@@ -174,7 +171,6 @@
   "exclude": [
     "../dist",
     "../.data",
-    "../../../../node_modules",
     "../node_modules/runtime/server",
     "../node_modules/dist/runtime/server",
     "../.output"

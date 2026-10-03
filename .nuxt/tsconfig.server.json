@@ -45,7 +45,7 @@
         "../node_modules/@vue/compiler-sfc"
       ],
       "@nuxt/schema": [
-        "../node_modules/@nuxt/schema"
+        "../node_modules/nuxt/node_modules/@nuxt/schema"
       ],
       "defu": [
         "../node_modules/defu"
@@ -115,6 +115,9 @@
       ],
       "#tailwind-config": [
         "./tailwind/expose"
+      ],
+      "#tailwind-config/*": [
+        "./tailwind/expose/*"
       ]
     },
     "lib": [
@@ -136,7 +139,6 @@
   ],
   "exclude": [
     "../node_modules",
-    "../../../../node_modules",
     "../node_modules/nuxt/node_modules",
     "../node_modules/@nuxtjs/tailwindcss/node_modules",
     "../node_modules/@nuxt/devtools/node_modules",

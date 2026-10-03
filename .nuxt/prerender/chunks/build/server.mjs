@@ -629,44 +629,44 @@ const _routes = [
     name: "login",
     path: "/login",
     meta: __nuxt_page_meta$2 || {},
-    component: () => import('./login-DsH7CjYL.mjs')
+    component: () => import('./login-BEf_uSIy.mjs')
   },
   {
     name: "dashboard-chats",
     path: "/dashboard/chats",
     meta: __nuxt_page_meta$1 || {},
-    component: () => import('./chats-ZtiMGH00.mjs')
+    component: () => import('./chats-BuE8OdhP.mjs')
   },
   {
     name: "dashboard",
     path: "/dashboard",
-    component: () => import('./index-CxpxoHk7.mjs')
+    component: () => import('./index-KDMy2qBo.mjs')
   },
   {
     name: "dashboard-items",
     path: "/dashboard/items",
-    component: () => import('./items-8VNzYZaB.mjs')
+    component: () => import('./items-DRfWJoKn.mjs')
   },
   {
     name: "dashboard-users",
     path: "/dashboard/users",
-    component: () => import('./users-BniCKPEz.mjs')
+    component: () => import('./users-BFYPkBhs.mjs')
   },
   {
     name: "dashboard-disputes",
     path: "/dashboard/disputes",
-    component: () => import('./disputes-BS3aOyMP.mjs')
+    component: () => import('./disputes-Bp0LO8uD.mjs')
   },
   {
     name: "dashboard-settings",
     path: "/dashboard/settings",
     meta: __nuxt_page_meta || {},
-    component: () => import('./settings-CoQ8WIvN.mjs')
+    component: () => import('./settings-qfIxw0kI.mjs')
   },
   {
     name: "dashboard-logistics",
     path: "/dashboard/logistics",
-    component: () => import('./logistics-LSrWlJJO.mjs')
+    component: () => import('./logistics-C9XK4TEL.mjs')
   }
 ];
 const validate = /* @__PURE__ */ defineNuxtRouteMiddleware(async (to) => {
@@ -1031,7 +1031,7 @@ const plugins = [
   prerender_server_sqIxOBipVr4FbVMA9kqWL0wT8FPop6sKAXLVfifsJzk
 ];
 const layouts = {
-  default: defineAsyncComponent(() => import('./default-DjYfBe--.mjs').then((m) => m.default || m))
+  default: defineAsyncComponent(() => import('./default-DB-XCnU0.mjs').then((m) => m.default || m))
 };
 const routeRulesMatcher = _routeRulesMatcher;
 const LayoutLoader = defineComponent({

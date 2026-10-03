@@ -68,29 +68,29 @@
           <div class="relative">
             <button @click="showNotifications = !showNotifications; showProfile = false" class="relative p-2 text-slate-400 hover:text-slate-600 transition-colors rounded-full hover:bg-slate-100">
               <Bell class="w-5 h-5" />
-              <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+              <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
             </button>
             <div v-if="showNotifications" class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50">
               <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <h3 class="font-bold text-slate-800">Notifications</h3>
-                <button class="text-xs text-brand-600 font-semibold hover:underline">Mark all read</button>
+                <button class="text-sm text-brand-600 font-semibold hover:underline">Mark all read</button>
               </div>
               <div class="divide-y divide-slate-50 max-h-[300px] overflow-y-auto">
                 <div class="p-4 hover:bg-slate-50 cursor-pointer transition-colors" v-for="i in 3" :key="i">
                   <p class="text-sm font-medium text-slate-800">New escrow dispute opened</p>
-                  <p class="text-xs text-slate-500 mt-1">Transaction #TXN-{{i}}892 needs your attention.</p>
+                  <p class="text-sm text-slate-500 mt-1">Transaction #TXN-{{i}}892 needs your attention.</p>
                   <span class="text-[10px] text-slate-400 mt-2 block">10 minutes ago</span>
                 </div>
               </div>
               <div class="p-3 border-t border-slate-100 text-center bg-slate-50">
-                <NuxtLink to="/dashboard/notifications" @click="showNotifications = false" class="text-xs font-bold text-slate-600 hover:text-brand-600 transition-colors">View All Notifications</NuxtLink>
+                <NuxtLink to="/dashboard/notifications" @click="showNotifications = false" class="text-sm font-bold text-slate-600 hover:text-brand-600 transition-colors">View All Notifications</NuxtLink>
               </div>
             </div>
           </div>
 
           <!-- Profile Dropdown -->
           <div class="relative">
-            <button @click="showProfile = !showProfile; showNotifications = false" class="h-9 w-9 rounded-full bg-brand-100 border-2 border-brand-200 flex items-center justify-center overflow-hidden hover:border-brand-400 transition-colors">
+            <button @click="showProfile = !showProfile; showNotifications = false" class="h-9 w-9 rounded-full bg-brand-100 border border-brand-200 flex items-center justify-center overflow-hidden hover:border-brand-400 transition-colors">
               <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" alt="Admin" class="w-full h-full object-cover">
             </button>
             <div v-if="showProfile" class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50">
@@ -100,7 +100,7 @@
                 </div>
                 <div>
                   <h3 class="text-sm font-bold text-slate-900">Admin User</h3>
-                  <p class="text-xs text-slate-500">Superadmin</p>
+                  <p class="text-sm text-slate-500">Superadmin</p>
                 </div>
               </div>
               <div class="p-2 space-y-1">

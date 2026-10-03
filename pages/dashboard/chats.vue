@@ -1,6 +1,6 @@
 <template>
   <div class="h-screen w-full flex flex-col bg-slate-50 relative">
-    <div class="flex items-center justify-between shrink-0 p-6 border-b border-slate-200 bg-white">
+    <div class="flex items-center justify-between shrink-0 p-4 sm:p-6 border-b border-slate-200 bg-white">
       <div class="flex items-center gap-4">
         <NuxtLink to="/dashboard" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-colors">
           <ArrowLeft class="w-5 h-5" />
@@ -39,7 +39,7 @@
           </div>
           <div class="flex-1 overflow-y-auto">
             <!-- Loading State for Chats -->
-            <div v-if="loadingChats" class="flex justify-center p-8">
+            <div v-if="loadingChats" class="flex justify-center p-4 sm:p-8">
               <Loader2 class="animate-spin text-brand-600 w-6 h-6" />
             </div>
             
@@ -47,9 +47,9 @@
               <div v-for="i in 3" :key="i" class="p-4 hover:bg-slate-50 cursor-pointer transition-colors relative" :class="{'bg-brand-50/50': i === 1}">
                 <div class="flex justify-between items-start mb-1">
                   <span class="font-bold text-slate-900 text-sm">User {{ i }}8472</span>
-                  <span class="text-xs text-slate-400">10:4{{ i }} AM</span>
+                  <span class="text-sm text-slate-400">10:4{{ i }} AM</span>
                 </div>
-                <p class="text-xs text-slate-500 truncate pr-4">I have an issue with the recent {{ activeTab.toLowerCase() }} transaction. Please help!</p>
+                <p class="text-sm text-slate-500 truncate pr-4">I have an issue with the recent {{ activeTab.toLowerCase() }} transaction. Please help!</p>
                 <div v-if="i === 1" class="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 bg-brand-500 rounded-full"></div>
               </div>
             </div>
@@ -59,19 +59,19 @@
         <!-- Chat View -->
         <div class="flex-1 flex flex-col bg-slate-50/30 relative">
           <!-- Chat Header -->
-          <div class="h-16 border-b border-slate-100 bg-white px-6 flex items-center justify-between shrink-0">
+          <div class="h-16 border-b border-slate-100 bg-white px-4 sm:px-6 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 bg-slate-200 rounded-full"></div>
               <div>
                 <h3 class="font-bold text-slate-900 text-sm">User 18472</h3>
-                <p class="text-xs text-slate-500">Active now</p>
+                <p class="text-sm text-slate-500">Active now</p>
               </div>
             </div>
-            <button class="text-xs font-bold text-slate-500 hover:text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg">Resolve Ticket</button>
+            <button class="text-sm font-bold text-slate-500 hover:text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg">Resolve Ticket</button>
           </div>
           
           <!-- Chat Messages -->
-          <div class="flex-1 p-6 overflow-y-auto space-y-6" id="chat-messages">
+          <div class="flex-1 p-4 sm:p-6 overflow-y-auto space-y-6" id="chat-messages">
             <!-- Empty state mockup for demo -->
             <div class="flex flex-col items-center justify-center h-full opacity-50" v-if="messages.length === 0">
               <MessageSquare class="w-12 h-12 text-slate-300 mb-4" />
@@ -82,7 +82,7 @@
             <div v-for="msg in messages" :key="msg.id" class="flex items-start gap-3" :class="{'flex-row-reverse': msg.isMine}">
               <div v-if="!msg.isMine" class="w-8 h-8 bg-slate-200 rounded-full shrink-0"></div>
               <div v-else class="w-8 h-8 bg-brand-100 rounded-full flex items-center justify-center shrink-0">
-                <span class="font-bold text-brand-600 text-xs">B.</span>
+                <span class="font-bold text-brand-600 text-sm">B.</span>
               </div>
               
               <div class="max-w-md shadow-sm" :class="msg.isMine ? 'bg-brand-600 rounded-2xl rounded-tr-none p-4' : 'bg-white border border-slate-200 rounded-2xl rounded-tl-none p-4'">
@@ -98,7 +98,7 @@
                   <div class="flex-1 h-1.5 bg-black/20 rounded-full overflow-hidden">
                     <div class="h-full bg-white/80 w-1/3"></div>
                   </div>
-                  <span class="text-xs">0:14</span>
+                  <span class="text-sm">0:14</span>
                 </div>
 
                 <p class="text-sm" :class="msg.isMine ? 'text-white' : 'text-slate-700'">{{ msg.text }}</p>

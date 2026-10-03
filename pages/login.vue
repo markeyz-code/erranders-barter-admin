@@ -5,7 +5,7 @@
     <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-orange-400/10 blur-3xl"></div>
 
     <div class="max-w-md w-full mx-4 relative z-10">
-      <div class="bg-white/80 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-white">
+      <div class="bg-white/80 backdrop-blur-xl p-4 sm:p-8 sm:p-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-white">
         
         <div class="text-center mb-6 flex flex-col items-center">
           <img src="/logo.png" alt="Erranders Barter Admin" class="h-16 w-auto mb-4" />
@@ -67,7 +67,7 @@
             {{ error }}
           </div>
 
-          <button type="submit" :disabled="loading" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-brand-500/25 mt-6">
+          <button type="submit" :disabled="loading" class="group relative w-full flex justify-center py-3 px-3 border border-transparent text-sm font-bold rounded-xl text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-brand-500/25 mt-6">
             <span v-if="loading" class="flex items-center">
               <Loader2 class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" />
               Signing in...

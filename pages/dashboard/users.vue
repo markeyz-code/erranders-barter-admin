@@ -53,40 +53,40 @@
         <table v-else class="min-w-full divide-y divide-slate-100 text-left">
           <thead class="bg-slate-50/50">
             <tr>
-              <th scope="col" class="px-6 py-4 font-semibold text-xs text-slate-500 uppercase tracking-wider">User</th>
-              <th scope="col" class="px-6 py-4 font-semibold text-xs text-slate-500 uppercase tracking-wider">Contact</th>
-              <th scope="col" class="px-6 py-4 font-semibold text-xs text-slate-500 uppercase tracking-wider">Status</th>
-              <th scope="col" class="px-6 py-4 font-semibold text-xs text-slate-500 uppercase tracking-wider text-right">Actions</th>
+              <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider">User</th>
+              <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider">Contact</th>
+              <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider">Status</th>
+              <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-slate-100">
             <tr v-for="user in paginatedUsers" :key="user._id" class="hover:bg-slate-50/80 transition-colors group">
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div class="h-10 w-10 flex-shrink-0">
                     <img class="h-10 w-10 rounded-full bg-slate-200 object-cover" :src="`https://ui-avatars.com/api/?name=${encodeURIComponent((user.firstName || '') + ' ' + (user.lastName || ''))}&background=random`" alt="">
                   </div>
                   <div class="ml-4">
                     <div class="text-sm font-bold text-slate-900">{{ user.firstName }} {{ user.lastName }}</div>
-                    <div class="text-xs text-slate-500 font-medium">Joined {{ new Date(user.createdAt || Date.now()).toLocaleDateString() }}</div>
+                    <div class="text-sm text-slate-500 font-medium">Joined {{ new Date(user.createdAt || Date.now()).toLocaleDateString() }}</div>
                   </div>
                 </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                 <div class="text-sm text-slate-700 font-medium">{{ user.email }}</div>
-                <div class="text-xs text-slate-500">{{ user.phone || 'No phone provided' }}</div>
+                <div class="text-sm text-slate-500">{{ user.phone || 'No phone provided' }}</div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span v-if="user.isVerified" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
+              <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
+                <span v-if="user.isVerified" class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
                   <CheckCircle2 class="w-3 h-3 mr-1" />
                   Verified
                 </span>
-                <span v-else class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200">
+                <span v-else class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-semibold bg-amber-100 text-amber-700 border border-amber-200">
                   <AlertCircle class="w-3 h-3 mr-1" />
                   Unverified
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="relative inline-block text-left" @click.stop>
                   <button @click="toggleDropdown(user._id)" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                     <MoreVertical class="w-4 h-4" />
@@ -114,7 +114,7 @@
       </div>
       
       <!-- Pagination -->
-      <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between" v-if="filteredUsers.length > 0">
+      <div class="px-4 sm:px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between" v-if="filteredUsers.length > 0">
         <span class="text-sm text-slate-500">Showing <span class="font-semibold text-slate-900">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> to <span class="font-semibold text-slate-900">{{ Math.min(currentPage * itemsPerPage, filteredUsers.length) }}</span> of <span class="font-semibold text-slate-900">{{ filteredUsers.length }}</span> results</span>
         <div class="flex gap-2">
           <button @click="currentPage--" :disabled="currentPage === 1" class="px-3 py-1 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 bg-white hover:bg-slate-50 disabled:opacity-50">Previous</button>
@@ -126,7 +126,7 @@
     <!-- Action Modal -->
     <Teleport to="body">
       <div v-if="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-2xl w-full max-w-sm p-6 border border-slate-200">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-4 sm:p-6 border border-slate-200">
           <h3 class="text-lg font-bold text-slate-900 mb-2">{{ modalTitle }}</h3>
           <p class="text-slate-500 text-sm mb-6">{{ modalMessage }}</p>
           <div class="flex gap-3 justify-end">

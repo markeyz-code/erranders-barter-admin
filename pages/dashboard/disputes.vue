@@ -46,43 +46,43 @@
         <table v-else class="min-w-full divide-y divide-slate-100 text-left">
           <thead class="bg-slate-50/50">
             <tr>
-              <th scope="col" class="px-6 py-4 font-semibold text-xs text-slate-500 uppercase tracking-wider">Transaction ID</th>
-              <th scope="col" class="px-6 py-4 font-semibold text-xs text-slate-500 uppercase tracking-wider">Amount</th>
-              <th scope="col" class="px-6 py-4 font-semibold text-xs text-slate-500 uppercase tracking-wider">Status</th>
-              <th scope="col" class="px-6 py-4 font-semibold text-xs text-slate-500 uppercase tracking-wider text-right">Actions</th>
+              <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider">Transaction ID</th>
+              <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider">Amount</th>
+              <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider">Status</th>
+              <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-slate-100">
             <tr v-for="tx in paginatedTransactions" :key="tx._id" class="hover:bg-slate-50/80 transition-colors group">
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center gap-3">
                   <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
                     <Hash class="w-4 h-4 text-slate-400" />
                   </div>
                   <div>
                     <div class="text-sm font-bold text-slate-900 font-mono">{{ tx._id }}</div>
-                    <div class="text-xs text-slate-500">Created: {{ new Date().toLocaleDateString() }}</div>
+                    <div class="text-sm text-slate-500">Created: {{ new Date().toLocaleDateString() }}</div>
                   </div>
                 </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-black text-slate-900">₦{{ Number(tx.amount || 0).toLocaleString() }}</div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span v-if="tx.status === 'disputed'" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200">
+              <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
+                <span v-if="tx.status === 'disputed'" class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-700 border border-red-200">
                   <AlertTriangle class="w-3 h-3 mr-1" />
                   Disputed
                 </span>
-                <span v-else-if="tx.status === 'released'" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                <span v-else-if="tx.status === 'released'" class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
                   <CheckCircle2 class="w-3 h-3 mr-1" />
                   Released
                 </span>
-                <span v-else class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 border border-amber-200">
+                <span v-else class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-semibold bg-amber-100 text-amber-700 border border-amber-200">
                   <Clock class="w-3 h-3 mr-1" />
                   Held
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="relative inline-block text-left" @click.stop>
                   <button @click="toggleDropdown(tx._id)" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                     <MoreVertical class="w-4 h-4" />
@@ -112,7 +112,7 @@
         </table>
       </div>
       <!-- Pagination -->
-      <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between" v-if="filteredTransactions.length > 0">
+      <div class="px-4 sm:px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between" v-if="filteredTransactions.length > 0">
         <span class="text-sm text-slate-500">Showing <span class="font-semibold text-slate-900">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> to <span class="font-semibold text-slate-900">{{ Math.min(currentPage * itemsPerPage, filteredTransactions.length) }}</span> of <span class="font-semibold text-slate-900">{{ filteredTransactions.length }}</span> results</span>
         <div class="flex gap-2">
           <button @click="currentPage--" :disabled="currentPage === 1" class="px-3 py-1 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 bg-white hover:bg-slate-50 disabled:opacity-50">Previous</button>
@@ -124,7 +124,7 @@
     <!-- Action Modal -->
     <Teleport to="body">
       <div v-if="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-2xl w-full max-w-sm p-6 border border-slate-200">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-4 sm:p-6 border border-slate-200">
           <h3 class="text-lg font-bold text-slate-900 mb-2">{{ modalTitle }}</h3>
           <p class="text-slate-500 text-sm mb-6">{{ modalMessage }}</p>
           <div class="flex gap-3 justify-end">

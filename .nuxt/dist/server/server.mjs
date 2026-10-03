@@ -607,44 +607,44 @@ const _routes = [
     name: "login",
     path: "/login",
     meta: __nuxt_page_meta$2 || {},
-    component: () => import("./_nuxt/login-DsH7CjYL.js")
+    component: () => import("./_nuxt/login-BEf_uSIy.js")
   },
   {
     name: "dashboard-chats",
     path: "/dashboard/chats",
     meta: __nuxt_page_meta$1 || {},
-    component: () => import("./_nuxt/chats-ZtiMGH00.js")
+    component: () => import("./_nuxt/chats-BuE8OdhP.js")
   },
   {
     name: "dashboard",
     path: "/dashboard",
-    component: () => import("./_nuxt/index-CxpxoHk7.js")
+    component: () => import("./_nuxt/index-KDMy2qBo.js")
   },
   {
     name: "dashboard-items",
     path: "/dashboard/items",
-    component: () => import("./_nuxt/items-8VNzYZaB.js")
+    component: () => import("./_nuxt/items-DRfWJoKn.js")
   },
   {
     name: "dashboard-users",
     path: "/dashboard/users",
-    component: () => import("./_nuxt/users-BniCKPEz.js")
+    component: () => import("./_nuxt/users-BFYPkBhs.js")
   },
   {
     name: "dashboard-disputes",
     path: "/dashboard/disputes",
-    component: () => import("./_nuxt/disputes-BS3aOyMP.js")
+    component: () => import("./_nuxt/disputes-Bp0LO8uD.js")
   },
   {
     name: "dashboard-settings",
     path: "/dashboard/settings",
     meta: __nuxt_page_meta || {},
-    component: () => import("./_nuxt/settings-CoQ8WIvN.js")
+    component: () => import("./_nuxt/settings-qfIxw0kI.js")
   },
   {
     name: "dashboard-logistics",
     path: "/dashboard/logistics",
-    component: () => import("./_nuxt/logistics-LSrWlJJO.js")
+    component: () => import("./_nuxt/logistics-C9XK4TEL.js")
   }
 ];
 const validate = /* @__PURE__ */ defineNuxtRouteMiddleware(async (to) => {
@@ -1015,7 +1015,7 @@ const plugins = [
   prerender_server_sqIxOBipVr4FbVMA9kqWL0wT8FPop6sKAXLVfifsJzk
 ];
 const layouts = {
-  default: defineAsyncComponent(() => import("./_nuxt/default-DjYfBe--.js").then((m) => m.default || m))
+  default: defineAsyncComponent(() => import("./_nuxt/default-DB-XCnU0.js").then((m) => m.default || m))
 };
 const routeRulesMatcher = _routeRulesMatcher;
 const LayoutLoader = defineComponent({

@@ -53,16 +53,16 @@
         <table v-else class="min-w-full divide-y divide-slate-100 text-left">
           <thead class="bg-slate-50/50">
             <tr>
-              <th scope="col" class="px-6 py-4 font-semibold text-xs text-slate-500 uppercase tracking-wider">Item Details</th>
-              <th scope="col" class="px-6 py-4 font-semibold text-xs text-slate-500 uppercase tracking-wider">Type / Value</th>
-              <th scope="col" class="px-6 py-4 font-semibold text-xs text-slate-500 uppercase tracking-wider">Location</th>
-              <th scope="col" class="px-6 py-4 font-semibold text-xs text-slate-500 uppercase tracking-wider">Status</th>
-              <th scope="col" class="px-6 py-4 font-semibold text-xs text-slate-500 uppercase tracking-wider text-right">Moderation</th>
+              <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider">Item Details</th>
+              <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider">Type / Value</th>
+              <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider">Location</th>
+              <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider">Status</th>
+              <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider text-right">Moderation</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-slate-100">
             <tr v-for="item in paginatedItems" :key="item._id" class="hover:bg-slate-50/80 transition-colors group">
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div class="h-12 w-12 flex-shrink-0 bg-slate-100 rounded-xl overflow-hidden border border-slate-200">
                     <img v-if="item.images && item.images.length" class="h-12 w-12 object-cover" :src="item.images[0]" :alt="item.title">
@@ -70,12 +70,12 @@
                   </div>
                   <div class="ml-4">
                     <div class="text-sm font-bold text-slate-900">{{ item.title }}</div>
-                    <div class="text-xs text-slate-500 max-w-[200px] truncate">{{ item.description }}</div>
+                    <div class="text-sm text-slate-500 max-w-[200px] truncate">{{ item.description }}</div>
                   </div>
                 </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider"
+              <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
+                <span class="px-2 py-1 rounded-md text-sm font-bold uppercase tracking-wider"
                   :class="{
                     'bg-blue-100 text-blue-700': item.type === 'sell',
                     'bg-purple-100 text-purple-700': item.type === 'swap',
@@ -84,17 +84,17 @@
                   {{ item.type }}
                 </span>
                 <div class="text-sm font-black text-slate-900 mt-1" v-if="item.price">₦{{ item.price }}</div>
-                <div class="text-xs text-slate-500 mt-1 truncate max-w-[150px]" v-if="item.swapPreference">Wants: {{ item.swapPreference }}</div>
+                <div class="text-sm text-slate-500 mt-1 truncate max-w-[150px]" v-if="item.swapPreference">Wants: {{ item.swapPreference }}</div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+              <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                 <div class="flex items-center"><MapPin class="w-3 h-3 mr-1 text-slate-400" /> {{ item.location }}</div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
+              <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
                   {{ item.status }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div class="relative inline-block text-left" @click.stop>
                   <button @click="toggleDropdown(item._id)" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
                     <MoreVertical class="w-4 h-4" />
@@ -121,7 +121,7 @@
         </table>
       </div>
       <!-- Pagination -->
-      <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between" v-if="filteredItems.length > 0">
+      <div class="px-4 sm:px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between" v-if="filteredItems.length > 0">
         <span class="text-sm text-slate-500">Showing <span class="font-semibold text-slate-900">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> to <span class="font-semibold text-slate-900">{{ Math.min(currentPage * itemsPerPage, filteredItems.length) }}</span> of <span class="font-semibold text-slate-900">{{ filteredItems.length }}</span> results</span>
         <div class="flex gap-2">
           <button @click="currentPage--" :disabled="currentPage === 1" class="px-3 py-1 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 bg-white hover:bg-slate-50 disabled:opacity-50">Previous</button>
@@ -133,7 +133,7 @@
     <!-- Action Modal -->
     <Teleport to="body">
       <div v-if="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-2xl w-full max-w-sm p-6 border border-slate-200">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-4 sm:p-6 border border-slate-200">
           <h3 class="text-lg font-bold text-slate-900 mb-2">{{ modalTitle }}</h3>
           <p class="text-slate-500 text-sm mb-6">{{ modalMessage }}</p>
           <div class="flex gap-3 justify-end">

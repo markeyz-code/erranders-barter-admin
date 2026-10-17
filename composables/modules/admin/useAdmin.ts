@@ -1,29 +1,39 @@
 import { ref } from 'vue';
-import { adminApi } from '@/api_factory/modules/admin';
+import {
+  adminManagementApi,
+  adminErrorMessage,
+  type AdminEscrow,
+  type AdminStats,
+  type AdminUser,
+} from '@/api_factory/modules/adminManagement';
 
+/**
+ * Dashboard data. Every tile and table is backed by a real endpoint:
+ *   GET /admin/stats, GET /admin/users, GET /admin/escrows
+ * A failure is surfaced as an error with a retry, never as zeroed-out fake numbers.
+ */
 export const useAdminStats = () => {
   const loading = ref(false);
-  const users = ref([]);
-  const escrows = ref([]);
+  const stats = ref<AdminStats | null>(null);
+  const users = ref<AdminUser[]>([]);
+  const escrows = ref<AdminEscrow[]>([]);
   const error = ref<string | null>(null);
 
   const fetchStats = async () => {
     loading.value = true;
     error.value = null;
     try {
-      const [usersRes, escrowsRes] = await Promise.all([
-        adminApi.getUsers(),
-        adminApi.getEscrows()
+      const [statsRes, usersRes, escrowsRes] = await Promise.all([
+        adminManagementApi.getStats(),
+        adminManagementApi.listUsers(),
+        adminManagementApi.listEscrows(),
       ]);
-      users.value = usersRes.data || [];
-      escrows.value = escrowsRes.data || [];
+      stats.value = statsRes.data || null;
+      users.value = Array.isArray(usersRes.data) ? usersRes.data : [];
+      escrows.value = Array.isArray(escrowsRes.data) ? escrowsRes.data : [];
     } catch (err: any) {
-      // A failed request is an error, not an empty dashboard. Keeping the error
-      // lets the page show an honest retry screen instead of zeroed-out tiles.
-      error.value =
-        err?.response?.status === 401
-          ? 'Your session has expired — sign in again.'
-          : err?.response?.data?.message || 'Could not load dashboard data from the API.';
+      error.value = adminErrorMessage(err, 'Could not load dashboard data from the API.');
+      stats.value = null;
       users.value = [];
       escrows.value = [];
     } finally {
@@ -31,5 +41,5 @@ export const useAdminStats = () => {
     }
   };
 
-  return { loading, users, escrows, error, fetchStats };
+  return { loading, stats, users, escrows, error, fetchStats };
 };

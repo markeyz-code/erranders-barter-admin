@@ -117,24 +117,32 @@
               </td>
               <td class="px-4 py-3 text-slate-500 whitespace-nowrap">{{ formatDate(d.createdAt) }}</td>
               <td class="px-4 py-3 text-right">
-                <button
-                  v-if="d.status === 'failed'"
-                  class="px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-50 text-brand-700 hover:bg-brand-100 disabled:opacity-50"
-                  :disabled="busyId === d._id"
-                  @click="retry(d)"
-                >
-                  {{ busyId === d._id ? 'Retrying…' : 'Retry' }}
-                </button>
-                <a
-                  v-else-if="d.trackingUrl"
-                  :href="d.trackingUrl"
-                  target="_blank"
-                  rel="noopener"
-                  class="text-xs font-bold text-brand-700 hover:underline"
-                >
-                  Track
-                </a>
-                <span v-else class="text-xs text-slate-300">—</span>
+                <div class="inline-flex items-center gap-2">
+                  <button
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 disabled:opacity-50"
+                    :disabled="busyId === d._id"
+                    @click="openEdit(d)"
+                  >
+                    Update
+                  </button>
+                  <button
+                    v-if="d.status === 'failed'"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold bg-brand-50 text-brand-700 hover:bg-brand-100 disabled:opacity-50"
+                    :disabled="busyId === d._id"
+                    @click="retry(d)"
+                  >
+                    {{ busyId === d._id ? 'Retrying…' : 'Retry' }}
+                  </button>
+                  <a
+                    v-if="d.trackingUrl"
+                    :href="d.trackingUrl"
+                    target="_blank"
+                    rel="noopener"
+                    class="text-xs font-bold text-brand-700 hover:underline"
+                  >
+                    Track
+                  </a>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -159,6 +167,65 @@
         </button>
       </div>
     </div>
+
+    <!-- Assign a rider / move the dispatch status (PATCH /logistics/deliveries/:id) -->
+    <Teleport to="body">
+      <div v-if="editing" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm" @click.self="!editBusy && closeEdit()">
+        <div class="bg-white rounded-2xl w-full max-w-md border border-slate-200">
+          <div class="p-4 sm:p-6 border-b border-slate-100 flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <h3 class="text-lg font-bold text-slate-900">Update dispatch</h3>
+              <p class="text-xs text-slate-500 mt-1 truncate">{{ editing.itemTitle || 'Barter trade' }} · {{ editing._id.slice(-8) }}</p>
+            </div>
+            <button @click="closeEdit" :disabled="editBusy" class="p-1.5 text-slate-400 hover:bg-slate-100 rounded-full transition-colors disabled:opacity-40">
+              <X class="w-4 h-4" />
+            </button>
+          </div>
+
+          <form class="p-4 sm:p-6 space-y-4" @submit.prevent="saveEdit">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Delivery status</label>
+              <select v-model="editForm.status" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500">
+                <option v-for="s in STATUSES" :key="s" :value="s">{{ labelFor(s) }}</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Rider name</label>
+              <input v-model="editForm.riderName" type="text" placeholder="Who is carrying this delivery?" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Rider phone</label>
+              <input v-model="editForm.riderPhone" type="tel" placeholder="080…" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Ops notes</label>
+              <textarea v-model="editForm.notes" rows="2" placeholder="Anything the next operator should know…" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none resize-none"></textarea>
+            </div>
+
+            <p class="text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-xl p-3">
+              Setting the status to <strong>Assigned</strong> and adding a rider records the assignment. Moving to
+              <strong>Delivered</strong> stamps the delivery time; <strong>Cancelled</strong> stamps the cancellation time.
+            </p>
+
+            <div v-if="editError" class="bg-red-50 border border-red-100 text-red-700 rounded-xl p-3 text-sm flex items-start gap-2">
+              <AlertTriangle class="w-4 h-4 mt-0.5 shrink-0" />
+              <span>{{ editError }}</span>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+              <button type="button" @click="closeEdit" :disabled="editBusy" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50">Cancel</button>
+              <button type="submit" :disabled="editBusy" class="px-5 py-2 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2">
+                <Loader2 v-if="editBusy" class="w-4 h-4 animate-spin" />
+                {{ editBusy ? 'Saving…' : 'Save dispatch' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -166,7 +233,7 @@
 import { ref, computed, onMounted } from 'vue';
 import {
   RefreshCw, Loader2, AlertTriangle, Truck,
-  PackageCheck, Clock, XCircle, Activity,
+  PackageCheck, Clock, XCircle, Activity, X,
 } from 'lucide-vue-next';
 import { logisticsApi, type Dispatch, type DispatchStatus, type DispatchStats } from '~/api_factory/modules/logistics';
 
@@ -282,6 +349,64 @@ const retry = async (d: Dispatch) => {
     error.value = err?.response?.data?.message || 'Could not retry this dispatch.';
   } finally {
     busyId.value = '';
+  }
+};
+
+// --- Rider assignment / status update -------------------------------------
+const editing = ref<Dispatch | null>(null);
+const editBusy = ref(false);
+const editError = ref('');
+const editForm = ref({
+  status: 'pending' as DispatchStatus,
+  riderName: '',
+  riderPhone: '',
+  notes: '',
+});
+
+const openEdit = (d: Dispatch) => {
+  editing.value = d;
+  editError.value = '';
+  editForm.value = {
+    status: d.status,
+    riderName: d.riderName || '',
+    riderPhone: d.riderPhone || '',
+    notes: d.notes || '',
+  };
+};
+
+const closeEdit = () => {
+  if (editBusy.value) return;
+  editing.value = null;
+  editError.value = '';
+};
+
+const saveEdit = async () => {
+  const dispatch = editing.value;
+  if (!dispatch || editBusy.value) return;
+
+  editBusy.value = true;
+  editError.value = '';
+  try {
+    const { data } = await logisticsApi.update(dispatch._id, {
+      status: editForm.value.status,
+      riderName: editForm.value.riderName.trim(),
+      riderPhone: editForm.value.riderPhone.trim(),
+      notes: editForm.value.notes.trim(),
+    });
+
+    const index = deliveries.value.findIndex((candidate) => candidate._id === dispatch._id);
+    if (index !== -1) deliveries.value[index] = data;
+
+    editing.value = null;
+    // Refresh the counters without blocking the table on a second list call.
+    logisticsApi
+      .stats()
+      .then(({ data: statsData }) => { stats.value = statsData; })
+      .catch(() => {});
+  } catch (err: any) {
+    editError.value = err?.response?.data?.message || 'Could not update this dispatch.';
+  } finally {
+    editBusy.value = false;
   }
 };
 

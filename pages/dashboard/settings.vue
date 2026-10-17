@@ -17,6 +17,15 @@
         <p class="text-slate-500 font-bold text-sm">Loading settings...</p>
       </div>
 
+      <div v-else-if="loadError" class="py-10 text-center">
+        <AlertCircle class="w-10 h-10 text-red-500 mx-auto mb-3" />
+        <p class="font-bold text-slate-900 mb-1">Could not load platform settings</p>
+        <p class="text-sm text-slate-500 max-w-sm mx-auto mb-4">{{ loadError }}</p>
+        <button @click="fetchSettings" class="px-4 py-2 bg-brand-600 text-white font-semibold rounded-xl text-sm">
+          Try again
+        </button>
+      </div>
+
       <form v-else @submit.prevent="saveSettings" class="space-y-6">
         
         <!-- Logistics Settings -->
@@ -124,7 +133,7 @@
 
 <script setup>
 import { useCustomToast } from '@/composables/core/useCustomToast';
-import { Settings } from 'lucide-vue-next'
+import { Settings, AlertCircle } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
 import { settingsApi } from '~/composables/useApi'
 
@@ -134,14 +143,16 @@ definePageMeta({
 
 const loading = ref(true)
 const saving = ref(false)
-const baseErranderFee = ref(500)
-const escrowFeePercentage = ref(0)
-const sellerCommissionPercentage = ref(0)
-const erranderCommissionPercentage = ref(0)
-const promotedListingFee = ref(500)
+const loadError = ref('')
+const baseErranderFee = ref(null)
+const escrowFeePercentage = ref(null)
+const sellerCommissionPercentage = ref(null)
+const erranderCommissionPercentage = ref(null)
+const promotedListingFee = ref(null)
 
 const fetchSettings = async () => {
   loading.value = true
+  loadError.value = ''
   try {
     const [baseErranderRes, escrowFeeRes, erranderCommRes, sellerCommRes, promoFeeRes] = await Promise.all([
       settingsApi.get('base_errander_fee'),
@@ -150,14 +161,31 @@ const fetchSettings = async () => {
       settingsApi.get('seller_commission_percentage'),
       settingsApi.get('promoted_listing_fee')
     ])
-    
-    if (baseErranderRes.data && baseErranderRes.data.value) baseErranderFee.value = Number(baseErranderRes.data.value)
-    if (escrowFeeRes.data && escrowFeeRes.data.value) escrowFeePercentage.value = Number(escrowFeeRes.data.value)
-    if (erranderCommRes.data && erranderCommRes.data.value) erranderCommissionPercentage.value = Number(erranderCommRes.data.value)
-    if (sellerCommRes.data && sellerCommRes.data.value) sellerCommissionPercentage.value = Number(sellerCommRes.data.value)
-    if (promoFeeRes.data && promoFeeRes.data.value) promotedListingFee.value = Number(promoFeeRes.data.value)
+
+    const read = (res) => {
+      const value = res?.data?.value
+      return value === null || value === undefined ? null : Number(value)
+    }
+
+    baseErranderFee.value = read(baseErranderRes)
+    escrowFeePercentage.value = read(escrowFeeRes)
+    erranderCommissionPercentage.value = read(erranderCommRes)
+    sellerCommissionPercentage.value = read(sellerCommRes)
+    promotedListingFee.value = read(promoFeeRes)
+
+    const missing = [
+      ['base_errander_fee', baseErranderFee.value],
+      ['escrow_fee_percentage', escrowFeePercentage.value],
+      ['errander_commission_percentage', erranderCommissionPercentage.value],
+      ['seller_commission_percentage', sellerCommissionPercentage.value],
+      ['promoted_listing_fee', promotedListingFee.value],
+    ].filter(([, value]) => value === null).map(([key]) => key)
+
+    if (missing.length) {
+      loadError.value = `These settings are missing from the API: ${missing.join(', ')}.`
+    }
   } catch (err) {
-    console.error(err)
+    loadError.value = 'The settings API did not respond. No values were assumed.'
   } finally {
     loading.value = false
   }

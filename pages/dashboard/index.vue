@@ -4,12 +4,17 @@
       <Loader2 class="animate-spin h-10 w-10 text-brand-600" />
     </div>
     
-    <div v-else-if="error" class="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 flex items-start">
-      <AlertCircle class="w-5 h-5 mt-0.5 mr-2 shrink-0" />
-      <div>
-        <h3 class="font-bold">Error loading dashboard</h3>
-        <p class="text-sm mt-1">{{ error }}</p>
+    <div v-else-if="error" class="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 flex items-start justify-between gap-4">
+      <div class="flex items-start">
+        <AlertCircle class="w-5 h-5 mt-0.5 mr-2 shrink-0" />
+        <div>
+          <h3 class="font-bold">Error loading dashboard</h3>
+          <p class="text-sm mt-1">{{ error }}</p>
+        </div>
       </div>
+      <button @click="fetchStats" class="shrink-0 px-4 py-2 bg-white border border-red-200 rounded-xl font-semibold text-sm hover:bg-red-100 transition-colors">
+        Try again
+      </button>
     </div>
 
     <div v-else class="space-y-6">
@@ -23,9 +28,7 @@
             <p class="text-slate-500 font-semibold text-sm uppercase tracking-wider mb-2">Total Volume</p>
             <p class="text-3xl font-black text-slate-900">₦{{ totalVolume.toLocaleString() }}</p>
             <div class="mt-4 flex items-center text-sm">
-              <TrendingUp class="w-4 h-4 text-emerald-500 mr-1" />
-              <span class="text-emerald-600 font-medium">+12%</span>
-              <span class="text-slate-400 ml-2">from last month</span>
+              <span class="text-slate-400">Across {{ escrows.length }} escrow transaction{{ escrows.length === 1 ? '' : 's' }}</span>
             </div>
           </div>
         </div>
@@ -38,9 +41,7 @@
             <p class="text-slate-500 font-semibold text-sm uppercase tracking-wider mb-2">Total Users</p>
             <p class="text-3xl font-black text-slate-900">{{ users.length }}</p>
             <div class="mt-4 flex items-center text-sm">
-              <TrendingUp class="w-4 h-4 text-emerald-500 mr-1" />
-              <span class="text-emerald-600 font-medium">+42</span>
-              <span class="text-slate-400 ml-2">new users</span>
+              <span class="text-slate-400">{{ verifiedUsers }} verified account{{ verifiedUsers === 1 ? '' : 's' }}</span>
             </div>
           </div>
         </div>
@@ -51,10 +52,10 @@
           </div>
           <div class="relative z-10">
             <p class="text-slate-500 font-semibold text-sm uppercase tracking-wider mb-2">Active Disputes</p>
-            <p class="text-3xl font-black text-slate-900">3</p>
+            <p class="text-3xl font-black text-slate-900">{{ activeDisputes }}</p>
             <div class="mt-4 flex items-center text-sm">
               <AlertCircle class="w-4 h-4 text-amber-500 mr-1" />
-              <span class="text-amber-600 font-medium">Needs attention</span>
+              <span class="text-amber-600 font-medium">{{ activeDisputes > 0 ? 'Needs attention' : 'Nothing to review' }}</span>
             </div>
           </div>
         </div>
@@ -106,8 +107,11 @@
                     </div>
                   </td>
                   <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
-                    <span class="px-2.5 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
-                      Active
+                    <span v-if="user.isVerified" class="px-2.5 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+                      Verified
+                    </span>
+                    <span v-else class="px-2.5 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+                      Unverified
                     </span>
                   </td>
                 </tr>
@@ -120,7 +124,7 @@
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden flex flex-col">
           <div class="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-center">
             <h3 class="text-lg font-bold text-slate-800">Recent Escrows</h3>
-            <button class="text-sm font-semibold text-brand-600 hover:text-brand-700">View All</button>
+            <NuxtLink to="/dashboard/disputes" class="text-sm font-semibold text-brand-600 hover:text-brand-700">View All</NuxtLink>
           </div>
           <div class="flex-1 overflow-auto">
             <div v-if="escrows.length === 0" class="p-4 sm:p-8 text-center text-slate-500 flex flex-col items-center">
@@ -163,42 +167,32 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useAdminStats } from '@/composables/modules/admin/useAdmin';
-import { 
-  Loader2, 
-  AlertCircle, 
-  CreditCard, 
-  Users, 
-  ShieldAlert, 
+import {
+  Loader2,
+  AlertCircle,
+  CreditCard,
+  Users,
+  ShieldAlert,
   CheckCircle2,
-  TrendingUp 
 } from 'lucide-vue-next';
 
-// Use a mock fallback if composable fails
-let statsInstance: any = { 
-  loading: ref(false), 
-  users: ref([]), 
-  escrows: ref([]), 
-  error: ref(null), 
-  fetchStats: async () => {} 
-};
+const { loading, users, escrows, error, fetchStats } = useAdminStats();
 
-try {
-  statsInstance = useAdminStats();
-} catch (e) {
-  console.warn('useAdminStats missing');
-}
+const totalVolume = computed(() =>
+  (escrows.value || []).reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0),
+);
 
-const { loading, users, escrows, error, fetchStats } = statsInstance;
+const verifiedUsers = computed(() =>
+  (users.value || []).filter((user: any) => user.isVerified).length,
+);
 
-const totalVolume = computed(() => {
-  return (escrows.value || []).reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0);
-});
+const activeDisputes = computed(() =>
+  (escrows.value || []).filter((tx: any) => tx.status === 'disputed').length,
+);
 
 onMounted(() => {
-  if (fetchStats) {
-    fetchStats();
-  }
+  fetchStats();
 });
 </script>

@@ -10,17 +10,8 @@
         <div class="text-center mb-6 flex flex-col items-center">
           <img src="/logo.png" alt="Erranders Barter Admin" class="h-16 w-auto mb-4" />
           <p class="mt-2 text-sm text-slate-500 font-medium">
-            Welcome back! Select your role to continue
+            Sign in with your Barter account to continue
           </p>
-        </div>
-
-        <div class="flex p-1 bg-slate-100 rounded-xl mb-6">
-          <button @click="loginRole = 'admin'" :class="loginRole === 'admin' ? 'bg-white shadow-sm text-slate-900 font-bold' : 'text-slate-500 font-medium hover:text-slate-700'" class="flex-1 py-2 text-sm rounded-lg transition-all">
-            Admin
-          </button>
-          <button @click="loginRole = 'support'" :class="loginRole === 'support' ? 'bg-white shadow-sm text-slate-900 font-bold' : 'text-slate-500 font-medium hover:text-slate-700'" class="flex-1 py-2 text-sm rounded-lg transition-all">
-            Support
-          </button>
         </div>
 
         <form class="space-y-5" @submit.prevent="handleLogin">
@@ -47,21 +38,6 @@
             </div>
           </div>
 
-          <div class="flex items-center justify-between mt-4">
-            <div class="flex items-center">
-              <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-brand-600 border-slate-300 rounded focus:ring-brand-500">
-              <label for="remember-me" class="ml-2 block text-sm text-slate-600 font-medium">
-                Remember me
-              </label>
-            </div>
-
-            <div class="text-sm">
-              <a href="#" class="font-semibold text-brand-600 hover:text-brand-500 transition-colors">
-                Forgot password?
-              </a>
-            </div>
-          </div>
-
           <div v-if="error" class="bg-red-50 text-red-600 text-sm p-3 rounded-xl border border-red-100 flex items-start">
             <AlertCircle class="w-4 h-4 mt-0.5 mr-2 shrink-0" />
             {{ error }}
@@ -73,7 +49,7 @@
               Signing in...
             </span>
             <span v-else class="flex items-center justify-center w-full">
-              Sign in as {{ loginRole === 'admin' ? 'Admin' : 'Support' }}
+              Sign in
               <ArrowRight class="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </span>
           </button>
@@ -86,7 +62,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { Mail, Lock, ArrowRight, Loader2, AlertCircle, ArrowRightLeft, Eye, EyeOff } from 'lucide-vue-next';
+import { Mail, Lock, ArrowRight, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-vue-next';
 import { useAuth } from '@/composables/modules/auth/useAuth';
 
 definePageMeta({
@@ -96,37 +72,18 @@ definePageMeta({
 const email = ref('');
 const password = ref('');
 const showPassword = ref(false);
-const loginRole = ref('admin');
 const router = useRouter();
 
-// Fallback just in case useAuth is not fully defined
-let authInstance: any = { login: async () => {}, loading: ref(false), error: ref('') };
-try {
-  authInstance = useAuth();
-} catch (e) {
-  console.warn('useAuth composable might be missing or broken');
-}
-
-const { login, loading, error } = authInstance;
+// Direct import: there is a real composable, so there is no stub auth path and
+// no fake delay pretending to be a network request.
+const { login, loading, error } = useAuth();
 
 const handleLogin = async () => {
   try {
-    if (authInstance.login) {
-      await login({ email: email.value, password: password.value, role: loginRole.value });
-    } else {
-      loading.value = true;
-      await new Promise(resolve => setTimeout(resolve, 800));
-      loading.value = false;
-    }
-    
-    // Different routing based on role
-    if (loginRole.value === 'support') {
-      window.location.href = '/dashboard/chats'; // Support goes directly to chats/complaints
-    } else {
-      window.location.href = '/dashboard'; // Admin goes to overview
-    }
-  } catch (err) {
-    console.error(err);
+    await login({ email: email.value, password: password.value });
+    router.push('/dashboard');
+  } catch {
+    // useAuth has already stored the API error message in `error`.
   }
 };
 </script>

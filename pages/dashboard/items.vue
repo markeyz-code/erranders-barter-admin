@@ -6,9 +6,13 @@
         <p class="text-sm text-slate-500 mt-1">Manage all Buy, Sell, and Swap listings. Automate fee collection and market integrity.</p>
       </div>
       <div class="flex gap-3">
-        <button class="px-4 py-2 bg-brand-600 text-white rounded-xl font-semibold text-sm hover:bg-brand-700 transition-colors flex items-center">
-          <Settings class="w-4 h-4 mr-2" />
-          Automation Rules
+        <button
+          class="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-colors flex items-center disabled:opacity-50"
+          :disabled="loading"
+          @click="fetchData"
+        >
+          <RefreshCw class="w-4 h-4 mr-2" :class="{ 'animate-spin': loading }" />
+          Refresh
         </button>
       </div>
     </div>
@@ -39,14 +43,26 @@
           <p class="text-slate-500 font-medium">Syncing live marketplace data...</p>
         </div>
         
+        <!-- Error State -->
+        <div v-else-if="error" class="flex flex-col items-center justify-center h-64 text-center px-4">
+          <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-4">
+            <AlertCircle class="w-8 h-8 text-red-500" />
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-1">Could not load listings</h3>
+          <p class="text-slate-500 text-sm max-w-sm">{{ error }}</p>
+          <button @click="fetchData" class="mt-4 px-4 py-2 bg-brand-600 text-white font-semibold rounded-xl text-sm">Try again</button>
+        </div>
+
         <!-- Empty State -->
         <div v-else-if="filteredItems.length === 0" class="flex flex-col items-center justify-center h-64 text-center px-4">
           <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
             <ShoppingBag class="w-8 h-8 text-slate-400" />
           </div>
           <h3 class="text-lg font-bold text-slate-900 mb-1">No listings found</h3>
-          <p class="text-slate-500 text-sm max-w-sm">There are no items matching your criteria in the live database.</p>
-          <button @click="resetFilters" class="mt-4 px-4 py-2 text-brand-600 bg-brand-50 hover:bg-brand-100 font-semibold rounded-xl text-sm transition-colors">Clear Filters</button>
+          <p class="text-slate-500 text-sm max-w-sm">
+            {{ items.length === 0 ? 'No active listings exist in the database yet.' : 'No listings match your current search and type filters.' }}
+          </p>
+          <button v-if="searchQuery || filterType !== 'all'" @click="resetFilters" class="mt-4 px-4 py-2 text-brand-600 bg-brand-50 hover:bg-brand-100 font-semibold rounded-xl text-sm transition-colors">Clear Filters</button>
         </div>
         
         <!-- Data Table -->
@@ -57,7 +73,6 @@
               <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider">Type / Value</th>
               <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider">Location</th>
               <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider">Status</th>
-              <th scope="col" class="px-4 sm:px-6 py-4 font-semibold text-sm text-slate-500 uppercase tracking-wider text-right">Moderation</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-slate-100">
@@ -83,38 +98,16 @@
                   }">
                   {{ item.type }}
                 </span>
-                <div class="text-sm font-black text-slate-900 mt-1" v-if="item.price">₦{{ item.price }}</div>
+                <div class="text-sm font-black text-slate-900 mt-1" v-if="item.price">₦{{ Number(item.price).toLocaleString() }}</div>
                 <div class="text-sm text-slate-500 mt-1 truncate max-w-[150px]" v-if="item.swapPreference">Wants: {{ item.swapPreference }}</div>
               </td>
               <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                 <div class="flex items-center"><MapPin class="w-3 h-3 mr-1 text-slate-400" /> {{ item.location }}</div>
               </td>
               <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-semibold border" :class="statusClass(item.status)">
                   {{ item.status }}
                 </span>
-              </td>
-              <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <div class="relative inline-block text-left" @click.stop>
-                  <button @click="toggleDropdown(item._id)" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
-                    <MoreVertical class="w-4 h-4" />
-                  </button>
-                  <div v-if="activeDropdown === item._id" class="absolute right-0 mt-2 w-48 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50 overflow-hidden divide-y divide-slate-50">
-                    <div class="p-1">
-                      <button @click="activeDropdown = null" class="w-full text-left flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
-                        <Eye class="w-4 h-4 mr-2 text-slate-400" /> View Listing
-                      </button>
-                      <button @click="activeDropdown = null" class="w-full text-left flex items-center px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-lg">
-                        <Edit2 class="w-4 h-4 mr-2 text-slate-400" /> Edit Metadata
-                      </button>
-                    </div>
-                    <div class="p-1">
-                      <button @click="takeDownItem(item); activeDropdown = null" class="w-full text-left flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg font-medium">
-                        <Trash2 class="w-4 h-4 mr-2 text-red-400" /> Remove Listing
-                      </button>
-                    </div>
-                  </div>
-                </div>
               </td>
             </tr>
           </tbody>
@@ -129,120 +122,81 @@
         </div>
       </div>
     </div>
-
-    <!-- Action Modal -->
-    <Teleport to="body">
-      <div v-if="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-2xl w-full max-w-sm p-4 sm:p-6 border border-slate-200">
-          <h3 class="text-lg font-bold text-slate-900 mb-2">{{ modalTitle }}</h3>
-          <p class="text-slate-500 text-sm mb-6">{{ modalMessage }}</p>
-          <div class="flex gap-3 justify-end">
-            <button @click="showModal = false" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-xl transition-colors">Cancel</button>
-            <button @click="executeModalAction" class="px-4 py-2 text-sm font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-xl transition-colors">Confirm</button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { Search, Loader2, ShoppingBag, MapPin, Image, Settings, Trash2, MoreVertical, Eye, Edit2 } from 'lucide-vue-next';
+import { ref, computed, onMounted, watch } from 'vue';
+import { itemsApi } from '~/api_factory/modules/items';
+import { Search, Loader2, ShoppingBag, MapPin, Image, RefreshCw, AlertCircle } from 'lucide-vue-next';
 
 const items = ref<any[]>([]);
 const loading = ref(true);
+const error = ref('');
 const searchQuery = ref('');
 const filterType = ref('all');
 
-// Dropdown State
-const activeDropdown = ref<string | null>(null);
-
-const toggleDropdown = (id: string) => {
-  activeDropdown.value = activeDropdown.value === id ? null : id;
-};
-
-const closeDropdowns = () => {
-  activeDropdown.value = null;
-};
-
-onMounted(() => {
-  document.addEventListener('click', closeDropdowns);
-  fetchData();
-});
-
-onUnmounted(() => {
-  document.removeEventListener('click', closeDropdowns);
-});
-
-// Pagination State
+// Pagination
 const currentPage = ref(1);
 const itemsPerPage = 10;
-
-// Modal State
-const showModal = ref(false);
-const modalTitle = ref('');
-const modalMessage = ref('');
-const pendingAction = ref<(() => void) | null>(null);
 
 const filteredItems = computed(() => {
   let result = items.value;
   if (filterType.value !== 'all') {
-    result = result.filter(i => i.type === filterType.value);
+    result = result.filter((i) => i.type === filterType.value);
   }
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();
-    result = result.filter(i => (i.title || '').toLowerCase().includes(q));
+    result = result.filter((i) => (i.title || '').toLowerCase().includes(q));
   }
   return result;
 });
 
 const totalPages = computed(() => Math.ceil(filteredItems.value.length / itemsPerPage) || 1);
+const paginatedItems = computed(() =>
+  filteredItems.value.slice(
+    (currentPage.value - 1) * itemsPerPage,
+    currentPage.value * itemsPerPage,
+  ),
+);
 
-const paginatedItems = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return filteredItems.value.slice(start, end);
+watch([searchQuery, filterType], () => {
+  currentPage.value = 1;
 });
-
-const executeModalAction = () => {
-  if (pendingAction.value) pendingAction.value();
-  showModal.value = false;
-};
 
 const resetFilters = () => {
   searchQuery.value = '';
   filterType.value = 'all';
 };
 
-const takeDownItem = (item: any) => {
-  modalTitle.value = 'Remove Listing';
-  modalMessage.value = `Are you sure you want to remove "${item.title}" from the marketplace?`;
-  pendingAction.value = () => {
-    items.value = items.value.filter(i => i._id !== item._id);
-  };
-  showModal.value = true;
+const statusClass = (status: string) => {
+  if (status === 'active') return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+  if (status === 'pending') return 'bg-amber-100 text-amber-700 border-amber-200';
+  return 'bg-slate-100 text-slate-600 border-slate-200';
 };
 
+/**
+ * Reads the real public listing feed (`GET /items`). If the request fails the
+ * page shows an error with retry — it never substitutes sample listings.
+ */
 const fetchData = async () => {
+  loading.value = true;
+  error.value = '';
   try {
-    const response = await fetch('http://localhost:3005/api/v1/items'); 
-    if (response.ok) {
-      const data = await response.json();
-      items.value = data.data || data;
-    } else {
-      throw new Error("Endpoint protected or unavailable");
-    }
-  } catch (err) {
-    console.warn("Using fallback seeded data representation due to CORS/Auth:", err);
-    items.value = [
-      { _id: '1', title: 'iPhone 13 Pro', description: 'Excellent condition, 256GB, Sierra Blue.', price: 700, type: 'sell', location: 'New York, NY', status: 'active', images: ['https://images.unsplash.com/photo-1632661674596-df8be070a5c5?q=80&w=2000&auto=format&fit=crop'] },
-      { _id: '2', title: 'MacBook Air M1', description: 'Looking to swap for a gaming PC.', swapPreference: 'Gaming PC with RTX 3060 or better', type: 'swap', location: 'Austin, TX', status: 'active', images: ['https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=2000&auto=format&fit=crop'] },
-      { _id: '3', title: 'Plumbing Services', description: 'Experienced plumber for home repairs.', price: 50, type: 'service', location: 'Chicago, IL', status: 'active', images: ['https://images.unsplash.com/photo-1585704032915-c3400ca199e7?q=80&w=2000&auto=format&fit=crop'] },
-      { _id: '4', title: 'Sony A7III Camera', description: 'Camera body only, lightly used.', price: 1200, type: 'sell', location: 'Seattle, WA', status: 'active', images: ['https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=2000&auto=format&fit=crop'] }
-    ];
+    const { data } = await itemsApi.list({});
+    items.value = Array.isArray(data) ? data : [];
+  } catch (err: any) {
+    error.value =
+      err?.response?.status === 401
+        ? 'Your session has expired — sign in again.'
+        : err?.response?.data?.message || 'The marketplace API did not respond.';
+    items.value = [];
   } finally {
     loading.value = false;
   }
 };
+
+onMounted(() => {
+  fetchData();
+});
 </script>

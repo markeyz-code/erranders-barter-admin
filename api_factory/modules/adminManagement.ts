@@ -189,6 +189,15 @@ export interface ResolveEscrowInput {
   note?: string;
 }
 
+/**
+ * The shape every admin list endpoint returns: `{ data, meta }`. Declared here
+ * because this module had no shared pagination type.
+ */
+export interface Paginated<T> {
+  data: T[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
+}
+
 export interface ListQuery {
   status?: string;
   type?: string;
@@ -214,6 +223,46 @@ export function adminErrorMessage(error: any, fallback: string): string {
     );
   }
   return error?.response?.data?.message || fallback;
+}
+
+
+export interface AdminService {
+  _id: string;
+  title: string;
+  priceType?: string;
+  price?: number;
+  durationMinutes?: number;
+  isActive: boolean;
+  isRemote?: boolean;
+  totalBookings?: number;
+  providerId?: { _id?: string; firstName?: string; lastName?: string; email?: string } | string;
+  createdAt?: string;
+}
+
+export interface AdminBooking {
+  _id: string;
+  date?: string;
+  startTime?: string;
+  endTime?: string;
+  status: string;
+  amount?: number;
+  serviceId?: { title?: string } | string;
+  providerId?: { firstName?: string; lastName?: string } | string;
+  customerId?: { firstName?: string; lastName?: string } | string;
+  createdAt?: string;
+}
+
+export interface AdminProvider {
+  _id: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  headline?: string;
+  isAcceptingBookings?: boolean;
+  services?: number;
+  bookings?: number;
+  rating?: number;
+  createdAt?: string;
 }
 
 export const adminManagementApi = {
@@ -263,6 +312,28 @@ export const adminManagementApi = {
    */
   resolveEscrow: (id: string, payload: ResolveEscrowInput) =>
     GATEWAY_ENDPOINT_WITH_AUTH.patch<AdminEscrow>(`/admin/escrows/${id}/resolve`, payload),
+  // ── Services & bookings (services vertical) ───────────────────────────────
+  // These admin routes exist on the backend (`AdminMarketplaceController`) but had
+  // no client, so there was no way to manage the services vertical at all.
+
+  listServices: (query: ListQuery = {}) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.get<Paginated<AdminService>>('/admin/services', {
+      params: cleanParams(query),
+    }),
+
+  moderateService: (id: string, payload: { isActive: boolean }) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.patch<AdminService>(`/admin/services/${id}`, payload),
+
+  listBookings: (query: ListQuery = {}) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.get<Paginated<AdminBooking>>('/admin/bookings', {
+      params: cleanParams(query),
+    }),
+
+  listProviders: (query: ListQuery = {}) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.get<Paginated<AdminProvider>>('/admin/providers', {
+      params: cleanParams(query),
+    }),
+
 };
 
 export default adminManagementApi;

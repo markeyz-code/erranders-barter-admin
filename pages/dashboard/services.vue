@@ -303,7 +303,9 @@ const providerEmail = (s: AdminService) => {
 const price = (s: AdminService) => {
   if (s.priceType === 'negotiable' || !s.price) return 'Negotiable';
   const base = `₦${Number(s.price).toLocaleString('en-NG')}`;
-  return s.priceType === 'hourly' ? `${base}/hr` : base;
+  if (s.priceType === 'hourly') return `${base}/hr`;
+  if (s.priceType === 'per_minute') return `${base}/min`;
+  return base;
 };
 
 const filteredRows = computed(() => {

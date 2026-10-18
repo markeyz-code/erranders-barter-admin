@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const envApiUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3005/api/v1";
+const envApiUrl = import.meta.env.VITE_API_BASE_URL || "https://barter-backend-api.erranders.org/api/v1";
 
 export const GATEWAY_ENDPOINT = axios.create({
   baseURL: envApiUrl,

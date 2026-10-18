@@ -137,10 +137,6 @@ import { Settings, AlertCircle } from 'lucide-vue-next'
 import { ref, onMounted } from 'vue'
 import { settingsApi } from '~/composables/useApi'
 
-definePageMeta({
-  layout: 'dashboard'
-})
-
 const loading = ref(true)
 const saving = ref(false)
 const loadError = ref('')

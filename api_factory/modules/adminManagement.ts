@@ -160,6 +160,23 @@ export interface AdminStats {
     completed: number;
     failed: number;
   };
+  services?: {
+    total: number;
+    active: number;
+    remote: number;
+    inactive: number;
+  };
+  bookings?: {
+    total: number;
+    pending: number;
+    confirmed: number;
+    completed: number;
+    cancelled: number;
+    totalValue: number;
+  };
+  providers?: {
+    total: number;
+  };
   revenue: {
     escrowFees: number;
     sellerCommissions: number;
@@ -226,16 +243,47 @@ export function adminErrorMessage(error: any, fallback: string): string {
 }
 
 
+export interface AdminCategory {
+  _id: string;
+  name: string;
+  icon?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface AdminService {
   _id: string;
   title: string;
+  description?: string;
   priceType?: string;
   price?: number;
   durationMinutes?: number;
+  bufferMinutes?: number;
   isActive: boolean;
   isRemote?: boolean;
+  location?: string;
+  images?: string[];
+  tags?: string[];
   totalBookings?: number;
-  providerId?: { _id?: string; firstName?: string; lastName?: string; email?: string } | string;
+  category?: { _id: string; name: string; icon?: string } | string;
+  providerId?: {
+    _id?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    avatar?: string;
+    university?: string;
+    hostel?: string;
+    level?: string;
+    rating?: number;
+    providerProfile?: {
+      headline?: string;
+      bio?: string;
+      skills?: string[];
+      serviceArea?: string;
+      isAcceptingBookings?: boolean;
+    };
+  } | string;
   createdAt?: string;
 }
 
@@ -246,9 +294,36 @@ export interface AdminBooking {
   endTime?: string;
   status: string;
   amount?: number;
-  serviceId?: { title?: string } | string;
-  providerId?: { firstName?: string; lastName?: string } | string;
-  customerId?: { firstName?: string; lastName?: string } | string;
+  notes?: string;
+  meetingUrl?: string;
+  chatId?: string;
+  cancelledBy?: string;
+  cancellationReason?: string;
+  serviceId?: {
+    _id?: string;
+    title?: string;
+    images?: string[];
+    price?: number;
+    priceType?: string;
+    durationMinutes?: number;
+    isRemote?: boolean;
+  } | string;
+  providerId?: {
+    _id?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    avatar?: string;
+    whatsappNumber?: string;
+  } | string;
+  customerId?: {
+    _id?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    avatar?: string;
+    whatsappNumber?: string;
+  } | string;
   createdAt?: string;
 }
 
@@ -257,11 +332,26 @@ export interface AdminProvider {
   firstName?: string;
   lastName?: string;
   email?: string;
+  avatar?: string;
+  university?: string;
+  hostel?: string;
+  level?: string;
   headline?: string;
+  bio?: string;
+  skills?: string[];
+  serviceArea?: string;
   isAcceptingBookings?: boolean;
+  isVerified?: boolean;
   services?: number;
   bookings?: number;
   rating?: number;
+  counts?: {
+    services?: number;
+    activeServices?: number;
+    bookings?: number;
+    completedBookings?: number;
+    upcomingBookings?: number;
+  };
   createdAt?: string;
 }
 
@@ -307,15 +397,12 @@ export const adminManagementApi = {
 
   /**
    * PATCH /admin/escrows/:id/resolve
-   * Release pays the seller; refund credits the buyer's wallet. The response reports
-   * `moneyMoved` and `amountMoved` from what actually happened.
+   * Release pays the seller; refund credits the buyer's wallet.
    */
   resolveEscrow: (id: string, payload: ResolveEscrowInput) =>
     GATEWAY_ENDPOINT_WITH_AUTH.patch<AdminEscrow>(`/admin/escrows/${id}/resolve`, payload),
-  // ── Services & bookings (services vertical) ───────────────────────────────
-  // These admin routes exist on the backend (`AdminMarketplaceController`) but had
-  // no client, so there was no way to manage the services vertical at all.
 
+  // ── Services & bookings (services vertical) ───────────────────────────────
   listServices: (query: ListQuery = {}) =>
     GATEWAY_ENDPOINT_WITH_AUTH.get<Paginated<AdminService>>('/admin/services', {
       params: cleanParams(query),
@@ -324,16 +411,37 @@ export const adminManagementApi = {
   moderateService: (id: string, payload: { isActive: boolean }) =>
     GATEWAY_ENDPOINT_WITH_AUTH.patch<AdminService>(`/admin/services/${id}`, payload),
 
+  deleteService: (id: string) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.delete(`/admin/services/${id}`),
+
   listBookings: (query: ListQuery = {}) =>
     GATEWAY_ENDPOINT_WITH_AUTH.get<Paginated<AdminBooking>>('/admin/bookings', {
       params: cleanParams(query),
     }),
+
+  updateBookingStatus: (id: string, payload: { status: string; reason?: string }) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.patch<AdminBooking>(`/admin/bookings/${id}/status`, payload),
 
   listProviders: (query: ListQuery = {}) =>
     GATEWAY_ENDPOINT_WITH_AUTH.get<Paginated<AdminProvider>>('/admin/providers', {
       params: cleanParams(query),
     }),
 
+  updateProvider: (id: string, payload: { isAcceptingBookings?: boolean; isServiceProvider?: boolean }) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.patch<AdminProvider>(`/admin/providers/${id}`, payload),
+
+  // ── Categories ─────────────────────────────────────────────────────────────
+  listCategories: () =>
+    GATEWAY_ENDPOINT_WITH_AUTH.get<AdminCategory[]>('/categories'),
+
+  createCategory: (payload: { name: string; icon?: string }) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.post<AdminCategory>('/categories', payload),
+
+  updateCategory: (id: string, payload: { name?: string; icon?: string }) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.patch<AdminCategory>(`/categories/${id}`, payload),
+
+  deleteCategory: (id: string) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.delete(`/categories/${id}`),
 };
 
 export default adminManagementApi;

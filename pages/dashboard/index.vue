@@ -105,6 +105,52 @@
             </div>
           </div>
         </div>
+
+        <!-- Services -->
+        <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 relative overflow-hidden group">
+          <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <Briefcase class="w-16 h-16 text-indigo-600" />
+          </div>
+          <div class="relative z-10">
+            <p class="text-slate-500 font-semibold text-sm uppercase tracking-wider mb-2">Campus Services</p>
+            <p class="text-3xl font-black text-slate-900">{{ (stats.services?.total ?? 0).toLocaleString() }}</p>
+            <div class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-400">
+              <span class="text-emerald-600 font-medium">{{ stats.services?.active ?? 0 }} active</span>
+              <span>{{ stats.services?.remote ?? 0 }} online/remote</span>
+              <span v-if="(stats.services?.inactive ?? 0) > 0" class="text-amber-600 font-medium">{{ stats.services?.inactive }} paused</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bookings -->
+        <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 relative overflow-hidden group">
+          <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <Calendar class="w-16 h-16 text-rose-600" />
+          </div>
+          <div class="relative z-10">
+            <p class="text-slate-500 font-semibold text-sm uppercase tracking-wider mb-2">Total Bookings</p>
+            <p class="text-3xl font-black text-slate-900">{{ (stats.bookings?.total ?? 0).toLocaleString() }}</p>
+            <div class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-400">
+              <span class="text-emerald-600 font-medium">{{ stats.bookings?.confirmed ?? 0 }} confirmed</span>
+              <span>{{ stats.bookings?.completed ?? 0 }} completed</span>
+              <span class="text-slate-600 font-semibold">{{ formatMoney(stats.bookings?.totalValue ?? 0) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Providers -->
+        <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200/60 relative overflow-hidden group">
+          <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <Sparkles class="w-16 h-16 text-violet-600" />
+          </div>
+          <div class="relative z-10">
+            <p class="text-slate-500 font-semibold text-sm uppercase tracking-wider mb-2">Service Providers</p>
+            <p class="text-3xl font-black text-slate-900">{{ (stats.providers?.total ?? 0).toLocaleString() }}</p>
+            <div class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-400">
+              <span class="text-indigo-600 font-medium">Students offering skills</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -196,6 +242,71 @@
           </div>
         </div>
       </div>
+
+      <!-- Recent Bookings -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden flex flex-col">
+        <div class="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-center">
+          <div>
+            <h3 class="text-lg font-bold text-slate-800">Recent Service Bookings</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Real-time appointments booked across campus skill providers</p>
+          </div>
+          <NuxtLink to="/dashboard/bookings" class="text-sm font-semibold text-brand-600 hover:text-brand-700">View All Bookings</NuxtLink>
+        </div>
+        <div class="flex-1 overflow-auto">
+          <div v-if="bookings.length === 0" class="p-4 sm:p-8 text-center text-slate-500 flex flex-col items-center">
+            <Calendar class="w-10 h-10 text-slate-300 mb-2" />
+            <p>No bookings found</p>
+          </div>
+          <table v-else class="min-w-full divide-y divide-slate-100">
+            <thead class="bg-slate-50/50">
+              <tr>
+                <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Service</th>
+                <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Customer & Provider</th>
+                <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date & Time</th>
+                <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Amount</th>
+                <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-slate-100">
+              <tr v-for="b in bookings.slice(0, 5)" :key="b._id" class="hover:bg-slate-50/50 transition-colors">
+                <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center gap-3">
+                    <div class="h-9 w-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm shrink-0">
+                      <Video v-if="isBookingRemote(b)" class="w-4 h-4 text-emerald-600" />
+                      <Briefcase v-else class="w-4 h-4 text-indigo-600" />
+                    </div>
+                    <div>
+                      <div class="text-sm font-semibold text-slate-900">{{ bookingServiceName(b) }}</div>
+                      <span v-if="isBookingRemote(b)" class="inline-flex items-center text-xs font-medium text-emerald-600">
+                        Online / Video Call
+                      </span>
+                      <span v-else class="inline-flex items-center text-xs text-slate-400">
+                        In-person appointment
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-xs text-slate-600">
+                  <div class="font-medium text-slate-900">{{ bookingParty(b.customerId) }} <span class="text-slate-400 font-normal">(Customer)</span></div>
+                  <div class="text-slate-500 mt-0.5">by {{ bookingParty(b.providerId) }} <span class="text-slate-400 font-normal">(Provider)</span></div>
+                </td>
+                <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-xs text-slate-600">
+                  <div class="font-medium text-slate-900">{{ b.date || '—' }}</div>
+                  <div class="text-slate-500 mt-0.5">{{ b.startTime || '—' }} <span v-if="b.endTime">- {{ b.endTime }}</span></div>
+                </td>
+                <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-900">
+                  {{ formatMoney(b.amount) }}
+                </td>
+                <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
+                  <span class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border capitalize" :class="bookingStatusClass(b.status)">
+                    {{ b.status }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -203,7 +314,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useAdminStats } from '@/composables/modules/admin/useAdmin';
-import type { AdminUser, AdminUserSummary } from '@/api_factory/modules/adminManagement';
+import type { AdminUser, AdminUserSummary, AdminBooking } from '@/api_factory/modules/adminManagement';
 import {
   Loader2,
   AlertCircle,
@@ -214,9 +325,13 @@ import {
   ShoppingBag,
   Wallet,
   Clock,
+  Briefcase,
+  Calendar,
+  Sparkles,
+  Video,
 } from 'lucide-vue-next';
 
-const { loading, stats, users, escrows, error, fetchStats } = useAdminStats();
+const { loading, stats, users, escrows, bookings, error, fetchStats } = useAdminStats();
 
 const formatMoney = (value?: number) => `₦${Number(value || 0).toLocaleString('en-NG')}`;
 
@@ -229,6 +344,35 @@ const partyName = (party?: AdminUserSummary | null) => {
   if (!party) return 'Unknown';
   const full = `${party.firstName || ''} ${party.lastName || ''}`.trim();
   return full || party.email || 'Unknown';
+};
+
+const bookingParty = (party?: any) => {
+  if (!party) return 'User';
+  if (typeof party === 'string') return 'User';
+  const full = `${party.firstName || ''} ${party.lastName || ''}`.trim();
+  return full || party.email || 'User';
+};
+
+const bookingServiceName = (b: AdminBooking) => {
+  if (b.serviceId && typeof b.serviceId === 'object' && b.serviceId.title) {
+    return b.serviceId.title;
+  }
+  return 'Service';
+};
+
+const isBookingRemote = (b: AdminBooking) => {
+  if (b.serviceId && typeof b.serviceId === 'object') {
+    return !!b.serviceId.isRemote;
+  }
+  return !!b.meetingUrl;
+};
+
+const bookingStatusClass = (status?: string) => {
+  if (status === 'confirmed') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+  if (status === 'completed') return 'bg-blue-50 text-blue-700 border-blue-200';
+  if (status === 'cancelled') return 'bg-red-50 text-red-700 border-red-200';
+  if (status === 'pending') return 'bg-amber-50 text-amber-700 border-amber-200';
+  return 'bg-slate-50 text-slate-600 border-slate-200';
 };
 
 const escrowStatusLabel = (status?: string) => {

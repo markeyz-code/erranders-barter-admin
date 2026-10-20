@@ -52,6 +52,10 @@
           <Building2 class="w-5 h-5 mr-3 shrink-0" />
           Businesses
         </NuxtLink>
+        <NuxtLink to="/dashboard/reports" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group" active-class="bg-brand-50 text-brand-700" inactive-class="text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+          <ShieldAlert class="w-5 h-5 mr-3 shrink-0" />
+          Moderation
+        </NuxtLink>
 
         <NuxtLink to="/dashboard/categories" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group" active-class="bg-brand-50 text-brand-700" inactive-class="text-slate-600 hover:bg-slate-50 hover:text-slate-900">
           <Tags class="w-5 h-5 mr-3 shrink-0" :class="{'text-brand-600': $route.path.startsWith('/dashboard/categories'), 'text-slate-400 group-hover:text-slate-600': !$route.path.startsWith('/dashboard/categories')}" />

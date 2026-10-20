@@ -356,6 +356,32 @@ export interface AdminProvider {
 }
 
 
+
+export interface AdminReport {
+  _id: string;
+  reporterId?: { firstName?: string; lastName?: string; email?: string } | string;
+  targetType: 'item' | 'user' | 'business' | 'message';
+  targetId: string;
+  targetLabel?: string;
+  reason: string;
+  details: string;
+  status: 'open' | 'reviewing' | 'resolved' | 'dismissed';
+  adminNote?: string;
+  createdAt?: string;
+}
+
+export interface AdminTicket {
+  _id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  status: 'open' | 'answered' | 'closed';
+  reference: string;
+  reply?: string;
+  createdAt?: string;
+}
+
 export interface AdminBusiness {
   _id: string;
   name: string;
@@ -472,6 +498,19 @@ export const adminManagementApi = {
     id: string,
     payload: { commissionRate?: number; isVerified?: boolean; isActive?: boolean },
   ) => GATEWAY_ENDPOINT_WITH_AUTH.patch<AdminBusiness>(`/admin/businesses/${id}`, payload),
+
+  // ── Moderation queue ─────────────────────────────────────────────────────
+  listReports: (query: ListQuery = {}) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.get<Paginated<AdminReport>>('/admin/reports', {
+      params: cleanParams(query),
+    }),
+  resolveReport: (id: string, payload: { status: 'reviewing' | 'resolved' | 'dismissed'; adminNote?: string }) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.patch<AdminReport>(`/admin/reports/${id}`, payload),
+
+  listTickets: (query: ListQuery = {}) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.get<AdminTicket[]>('/admin/tickets', { params: cleanParams(query) }),
+  updateTicket: (id: string, payload: { reply?: string; status?: 'open' | 'answered' | 'closed' }) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.patch<AdminTicket>(`/admin/tickets/${id}`, payload),
 
 };
 

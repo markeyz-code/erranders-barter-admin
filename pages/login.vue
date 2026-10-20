@@ -10,7 +10,7 @@
         <div class="text-center mb-6 flex flex-col items-center">
           <img src="/logo.png" alt="Erranders Barter Admin" class="h-16 w-auto mb-4" />
           <p class="mt-2 text-sm text-slate-500 font-medium">
-            Sign in with your Barter account to continue
+            Sign in with your account to continue
           </p>
         </div>
 

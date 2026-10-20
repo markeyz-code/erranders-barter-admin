@@ -41,10 +41,15 @@ function getCookie(name: string) {
     (response) => response,
     (err) => {
       if (err.response?.status === 401) {
+        if (err.config?.url?.includes('/auth/login') || err.config?.url?.includes('/auth/signup')) {
+          return Promise.reject(err);
+        }
         if (typeof window !== 'undefined') {
           document.cookie = 'barter_token=; Max-Age=0; path=/';
           localStorage.removeItem('barter_token');
-          window.location.href = '/login';
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
         }
       }
       return Promise.reject(err);

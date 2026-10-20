@@ -116,6 +116,27 @@
               </div>
               <p class="text-sm text-brand-700/80 mt-1 font-medium">The flat fee sellers can optionally pay to feature their listing at the top of the Explore page.</p>
             </div>
+
+            <!-- Service Businesses & Agency Commission -->
+            <div class="pt-4 border-t border-brand-200/60">
+              <div class="flex items-center justify-between mb-2">
+                <label class="block text-sm font-bold text-brand-800 uppercase">Service Business & Agency Commission (%)</label>
+                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-600 text-white">Vendors & Gigs</span>
+              </div>
+              <div class="relative">
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-slate-500">%</span>
+                <input 
+                  v-model.number="serviceBusinessCommissionPercentage" 
+                  type="number" 
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  required
+                  class="w-full bg-white border border-brand-200 rounded-xl pl-4 pr-10 py-3 outline-none focus:border-brand-500 font-bold transition-colors" 
+                />
+              </div>
+              <p class="text-sm text-brand-700/80 mt-1 font-medium">Platform commission deducted from registered service businesses (e.g. Fumigation services, Movers, Cleaning companies) on completed bookings.</p>
+            </div>
           </div>
         </div>
 
@@ -145,17 +166,19 @@ const escrowFeePercentage = ref(null)
 const sellerCommissionPercentage = ref(null)
 const erranderCommissionPercentage = ref(null)
 const promotedListingFee = ref(null)
+const serviceBusinessCommissionPercentage = ref(null)
 
 const fetchSettings = async () => {
   loading.value = true
   loadError.value = ''
   try {
-    const [baseErranderRes, escrowFeeRes, erranderCommRes, sellerCommRes, promoFeeRes] = await Promise.all([
+    const [baseErranderRes, escrowFeeRes, erranderCommRes, sellerCommRes, promoFeeRes, serviceBusinessRes] = await Promise.all([
       settingsApi.get('base_errander_fee'),
       settingsApi.get('escrow_fee_percentage'),
       settingsApi.get('errander_commission_percentage'),
       settingsApi.get('seller_commission_percentage'),
-      settingsApi.get('promoted_listing_fee')
+      settingsApi.get('promoted_listing_fee'),
+      settingsApi.get('service_business_commission_percentage').catch(() => ({ data: { value: 15 } }))
     ])
 
     const read = (res) => {
@@ -168,6 +191,7 @@ const fetchSettings = async () => {
     erranderCommissionPercentage.value = read(erranderCommRes)
     sellerCommissionPercentage.value = read(sellerCommRes)
     promotedListingFee.value = read(promoFeeRes)
+    serviceBusinessCommissionPercentage.value = read(serviceBusinessRes) ?? 15
 
     const missing = [
       ['base_errander_fee', baseErranderFee.value],
@@ -195,7 +219,8 @@ const saveSettings = async () => {
       settingsApi.update('escrow_fee_percentage', escrowFeePercentage.value),
       settingsApi.update('errander_commission_percentage', erranderCommissionPercentage.value),
       settingsApi.update('seller_commission_percentage', sellerCommissionPercentage.value),
-      settingsApi.update('promoted_listing_fee', promotedListingFee.value)
+      settingsApi.update('promoted_listing_fee', promotedListingFee.value),
+      settingsApi.update('service_business_commission_percentage', serviceBusinessCommissionPercentage.value)
     ])
     useCustomToast().showToast({ title: 'Notice', message: 'Settings updated successfully!', toastType: "success" })
   } catch (err) {

@@ -355,6 +355,26 @@ export interface AdminProvider {
   createdAt?: string;
 }
 
+
+export interface AdminBusiness {
+  _id: string;
+  name: string;
+  slug: string;
+  category: string;
+  commissionRate: number;
+  isActive: boolean;
+  isVerified: boolean;
+  ownerId?: { firstName?: string; lastName?: string; email?: string } | string;
+  counts?: {
+    staff?: number;
+    openings?: number;
+    bookings?: number;
+    completedBookings?: number;
+    gross?: number;
+    commission?: number;
+  };
+}
+
 export const adminManagementApi = {
   /** GET /admin/stats */
   getStats: () => GATEWAY_ENDPOINT_WITH_AUTH.get<AdminStats>('/admin/stats'),
@@ -442,6 +462,17 @@ export const adminManagementApi = {
 
   deleteCategory: (id: string) =>
     GATEWAY_ENDPOINT_WITH_AUTH.delete(`/categories/${id}`),
+  // ── Businesses (commission is set here, by the platform — nowhere else) ────
+  listBusinesses: (query: ListQuery = {}) =>
+    GATEWAY_ENDPOINT_WITH_AUTH.get<Paginated<AdminBusiness>>('/admin/businesses', {
+      params: cleanParams(query),
+    }),
+
+  updateBusiness: (
+    id: string,
+    payload: { commissionRate?: number; isVerified?: boolean; isActive?: boolean },
+  ) => GATEWAY_ENDPOINT_WITH_AUTH.patch<AdminBusiness>(`/admin/businesses/${id}`, payload),
+
 };
 
 export default adminManagementApi;
